@@ -1,0 +1,38 @@
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# IDE
+.idea/
+.vs/
+.vscode/
+*.user
+*.userprefs
+*.sln.iml
+
+# Visual Studio
+.vs/
+*.suo
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+*.sh
+
+# Local environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+.ncrunchproject
+.ncrunchsolution
+*.trx

@@ -9,6 +9,7 @@ obj/
 .idea/
 .vs/
 .vscode/
+.claude/
 *.user
 *.userprefs
 *.sln.iml

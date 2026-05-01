@@ -1,10 +1,10 @@
 # DropdownGcDemo
 
 Minimal repro of the GC-pressure bottleneck described in the blog post.
-Two implementations of the same dropdown render — one allocates like crazy,
-the other behaves.
+Three implementations of the same dropdown render — one allocates like
+crazy, the other two behave (in different ways).
 
-Runs on Windows, macOS, or Linux. You just need the .NET 8 SDK.
+Runs on Windows, macOS, or Linux. You need the .NET 10 SDK.
 
 ## Run it
 
@@ -12,23 +12,31 @@ Runs on Windows, macOS, or Linux. You just need the .NET 8 SDK.
 dotnet run -c Release
 ```
 
-You should see something like:
+You should see something like (numbers from a 1500-option, 1000-iteration,
+16-concurrent-renders run on a laptop):
 
 ```
 [SLOW: string concat + Replace in loop]
-  elapsed     :     ???? ms
-  allocated   :   1xxx.x MB
-  GC Gen0/1/2 :  xxx /  xx /  xx
+  elapsed     :    27693 ms
+  allocated   : 203,638.3 MB
+  GC Gen0/1/2 : 18093 / 14718 / 14577
 
-[FAST: HtmlAgilityPack]
-  elapsed     :     ???? ms
-  allocated   :    xxx.x MB
-  GC Gen0/1/2 :   xx /   x /   0
+[FAST  : StringBuilder, no Replace]
+  elapsed     :      126 ms
+  allocated   :    546.4 MB
+  GC Gen0/1/2 :   51 /   47 /   41
+
+[OK: HtmlAgilityPack]
+  elapsed     :     3135 ms
+  allocated   :  2,470.3 MB
+  GC Gen0/1/2 :  390 /  198 /    6
 ```
 
 The interesting numbers are the **allocated MB** and the **Gen 2 count**.
-The slow path promotes objects all the way out to Gen 2; the fast path
-barely touches Gen 1.
+The slow path promotes objects all the way out to Gen 2 by the thousands.
+Both fixes are an enormous improvement: `StringBuilder` wins on raw
+throughput and total allocations, while `HtmlAgilityPack` wins on Gen 2
+count — its short-lived DOM nodes die young in Gen 0.
 
 ## Profile it
 
